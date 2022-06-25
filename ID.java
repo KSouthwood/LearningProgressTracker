@@ -48,4 +48,14 @@ public class ID {
     private boolean isNew(final String email) {
         return !emails.containsKey(email);
     }
+
+    void printStudentList() {
+        if (emails.isEmpty()) {
+            System.out.println("No students found.");
+            return;
+        }
+
+        System.out.println("Students:");
+        emails.forEach((k, v) -> System.out.println(v));
+    }
 }

@@ -31,6 +31,7 @@ public class Controller {
 
             switch (command) {
                 case "add students" -> addStudents();
+                case "list" -> id.printStudentList();
                 case "exit" -> getCommands = false;
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 default -> System.out.println("Unknown command!");
