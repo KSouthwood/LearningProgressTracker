@@ -8,6 +8,13 @@ import java.util.regex.Pattern;
 public class Controller {
     private static final Scanner SCANNER = new Scanner(System.in);
 
+    private ID id;
+
+
+    {
+        id = new ID();
+    }
+
     Controller() {
 
     }
@@ -69,7 +76,7 @@ public class Controller {
      * @return true if the name and email are valid according to our rules
      *         (see validateName() and validateEmail())
      */
-    private boolean validateCredentials(final List<String> credentials) {
+    boolean validateCredentials(final List<String> credentials) {
         int listSize = credentials.size();
         String first = credentials.get(0);
         String last = String.join(" ", credentials.subList(1, listSize - 1));
@@ -90,7 +97,12 @@ public class Controller {
             return false;
         }
 
-        return true;
+        if (id.addStudent(first, last, email)) {
+            return true;
+        }
+
+        System.out.println("This email is already taken.");
+        return false;
     }
 
     /**
