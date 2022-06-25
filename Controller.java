@@ -32,6 +32,8 @@ public class Controller {
             switch (command) {
                 case "add students" -> addStudents();
                 case "list" -> id.printStudentList();
+                case "add points" -> addPoints();
+                case "find" -> findStudent();
                 case "exit" -> getCommands = false;
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 default -> System.out.println("Unknown command!");
@@ -146,5 +148,51 @@ public class Controller {
      */
     boolean validateEmail(final String email) {
         return email.matches("[\\w.]+@[\\w]+\\.[\\w]+");
+    }
+
+    private void addPoints() {
+        System.out.println("Enter an id and points or 'back' to return:");
+        boolean addMore = true;
+
+        while (addMore) {
+            String input = SCANNER.nextLine();
+
+            if (input.matches("back")) {
+                addMore = false;
+                continue;
+            }
+
+
+
+            if (input.matches("^\\w*(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
+                var inputs = input.split("\\s+");
+                if (!inputs[0].matches("\\d*")) {
+                    System.out.printf("No student is found for id=%s", inputs[0]);
+                    continue;
+                }
+
+                var ints = Arrays.stream(inputs).mapToInt(Integer::parseInt).toArray();
+                Student student = id.getStudent(ints[0]);
+                if (null == student) {
+                    System.out.printf("No student is found for id=%d", ints[0]);
+                    continue;
+                }
+
+                student.addPoints(ints[1], ints[2], ints[3], ints[4]);
+                continue;
+            }
+
+            System.out.println("Incorrect points format.");
+        }
+    }
+
+    void findStudent() {
+        System.out.println("Enter an id or 'back' to return:");
+        boolean find = true;
+
+        while (find) {
+
+        }
+
     }
 }
