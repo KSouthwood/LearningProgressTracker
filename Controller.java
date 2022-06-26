@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class Controller {
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    private ID id;
+    private final ID id;
 
 
     {
@@ -150,6 +150,12 @@ public class Controller {
         return email.matches("[\\w.]+@[\\w]+\\.[\\w]+");
     }
 
+    /**
+     * Add points to a student by their ID
+     *
+     * Gets a line of five tokens: student ID, four non-negative integers for points
+     * and adds the points to the specified student.
+     */
     private void addPoints() {
         System.out.println("Enter an id and points or 'back' to return:");
         boolean addMore = true;
@@ -162,8 +168,10 @@ public class Controller {
                 continue;
             }
 
-
-
+            // would rather use the first regex which ensures the ID portion matches our
+            // ID class limit. Hyperskill testing uses strings there and wants an
+            // "id not found" message for it, so the second regex is needed.
+//            if (input.matches("^\\d{4}(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
             if (input.matches("^\\w*(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
                 var inputs = input.split("\\s+");
                 if (!inputs[0].matches("\\d*")) {
@@ -174,7 +182,6 @@ public class Controller {
                 var ints = Arrays.stream(inputs).mapToInt(Integer::parseInt).toArray();
                 Student student = id.getStudent(ints[0]);
                 if (null == student) {
-                    System.out.printf("No student is found for id=%d", ints[0]);
                     continue;
                 }
 
@@ -186,12 +193,30 @@ public class Controller {
         }
     }
 
+    /**
+     * Prints the points for a student.
+     */
     void findStudent() {
         System.out.println("Enter an id or 'back' to return:");
         boolean find = true;
 
         while (find) {
+            String input = SCANNER.nextLine();
+            if (input.equals("back")) {
+                find = false;
+                continue;
+            }
 
+            if (input.matches("\\d+")) {
+                int studentID = Integer.parseInt(input);
+                Student student = id.getStudent(studentID);
+                if (null != student) {
+                    student.printPoints();
+                }
+                continue;
+            }
+
+            System.out.printf("No student is found for id=%s", input);
         }
 
     }

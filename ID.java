@@ -81,6 +81,7 @@ public class ID {
             return students.get(id);
         }
 
+        System.out.printf("No student is found for id=%d", id);
         return null;
     }
 }
