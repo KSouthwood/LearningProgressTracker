@@ -8,6 +8,13 @@ import java.util.regex.Pattern;
 public class Controller {
     private static final Scanner SCANNER = new Scanner(System.in);
 
+    private final ID id;
+
+
+    {
+        id = new ID();
+    }
+
     Controller() {
 
     }
@@ -24,6 +31,9 @@ public class Controller {
 
             switch (command) {
                 case "add students" -> addStudents();
+                case "list" -> id.printStudentList();
+                case "add points" -> addPoints();
+                case "find" -> findStudent();
                 case "exit" -> getCommands = false;
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 default -> System.out.println("Unknown command!");
@@ -69,7 +79,7 @@ public class Controller {
      * @return true if the name and email are valid according to our rules
      *         (see validateName() and validateEmail())
      */
-    private boolean validateCredentials(final List<String> credentials) {
+    boolean validateCredentials(final List<String> credentials) {
         int listSize = credentials.size();
         String first = credentials.get(0);
         String last = String.join(" ", credentials.subList(1, listSize - 1));
@@ -90,7 +100,12 @@ public class Controller {
             return false;
         }
 
-        return true;
+        if (id.addStudent(first, last, email)) {
+            return true;
+        }
+
+        System.out.println("This email is already taken.");
+        return false;
     }
 
     /**
@@ -133,5 +148,76 @@ public class Controller {
      */
     boolean validateEmail(final String email) {
         return email.matches("[\\w.]+@[\\w]+\\.[\\w]+");
+    }
+
+    /**
+     * Add points to a student by their ID
+     *
+     * Gets a line of five tokens: student ID, four non-negative integers for points
+     * and adds the points to the specified student.
+     */
+    private void addPoints() {
+        System.out.println("Enter an id and points or 'back' to return:");
+        boolean addMore = true;
+
+        while (addMore) {
+            String input = SCANNER.nextLine();
+
+            if (input.matches("back")) {
+                addMore = false;
+                continue;
+            }
+
+            // would rather use the first regex which ensures the ID portion matches our
+            // ID class limit. Hyperskill testing uses strings there and wants an
+            // "id not found" message for it, so the second regex is needed.
+//            if (input.matches("^\\d{4}(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
+            if (input.matches("^\\w*(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
+                var inputs = input.split("\\s+");
+                if (!inputs[0].matches("\\d*")) {
+                    System.out.printf("No student is found for id=%s", inputs[0]);
+                    continue;
+                }
+
+                var ints = Arrays.stream(inputs).mapToInt(Integer::parseInt).toArray();
+                Student student = id.getStudent(ints[0]);
+                if (null == student) {
+                    continue;
+                }
+
+                student.addPoints(ints[1], ints[2], ints[3], ints[4]);
+                continue;
+            }
+
+            System.out.println("Incorrect points format.");
+        }
+    }
+
+    /**
+     * Prints the points for a student.
+     */
+    void findStudent() {
+        System.out.println("Enter an id or 'back' to return:");
+        boolean find = true;
+
+        while (find) {
+            String input = SCANNER.nextLine();
+            if (input.equals("back")) {
+                find = false;
+                continue;
+            }
+
+            if (input.matches("\\d+")) {
+                int studentID = Integer.parseInt(input);
+                Student student = id.getStudent(studentID);
+                if (null != student) {
+                    student.printPoints();
+                }
+                continue;
+            }
+
+            System.out.printf("No student is found for id=%s", input);
+        }
+
     }
 }
