@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Controller {
-    private static final Scanner SCANNER = new Scanner(System.in);
+    private static Scanner SCANNER;
 
     private final ID id;
 
@@ -15,8 +15,8 @@ public class Controller {
         id = new ID();
     }
 
-    Controller() {
-
+    Controller(Scanner scanner) {
+        SCANNER = scanner;
     }
 
     void start() {
@@ -71,31 +71,31 @@ public class Controller {
      * Validate the name and email of the student
      *
      * Ensure that the first and last name as well as the email of the entered
-     * student are valid according to our rules. (See validateName() and
-     * validateEmail().)
+     * student are valid according to our rules. (See isValidName() and
+     * isValidEmail().)
      *
      * @param credentials a list of String's holding the name and email
      *
      * @return true if the name and email are valid according to our rules
-     *         (see validateName() and validateEmail())
+     *         (see isValidName() and isValidEmail())
      */
-    boolean validateCredentials(final List<String> credentials) {
+    private boolean validateCredentials(final List<String> credentials) {
         int listSize = credentials.size();
         String first = credentials.get(0);
         String last = String.join(" ", credentials.subList(1, listSize - 1));
         String email = credentials.get(listSize - 1);
 
-        if (!validateName(first)) {
+        if (!isValidName(first)) {
             System.out.println("Incorrect first name.");
             return false;
         }
 
-        if (!validateName(last)) {
+        if (!isValidName(last)) {
             System.out.println("Incorrect last name.");
             return false;
         }
 
-        if (!validateEmail(email)) {
+        if (!isValidEmail(email)) {
             System.out.println("Incorrect email.");
             return false;
         }
@@ -121,7 +121,7 @@ public class Controller {
      *
      * @return true if valid
      */
-    boolean validateName(final String name) {
+    private boolean isValidName(final String name) {
         Pattern notValid = Pattern.compile("'-|-'|--|''");
 
         for (var part : name.split("\\s")) {
@@ -146,7 +146,7 @@ public class Controller {
      *
      * @return true if valid
      */
-    boolean validateEmail(final String email) {
+    private boolean isValidEmail(final String email) {
         return email.matches("[\\w.]+@[\\w]+\\.[\\w]+");
     }
 
@@ -175,7 +175,7 @@ public class Controller {
             if (input.matches("^\\w*(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
                 var inputs = input.split("\\s+");
                 if (!inputs[0].matches("\\d*")) {
-                    System.out.printf("No student is found for id=%s", inputs[0]);
+                    System.out.printf("No student is found for id=%s%n", inputs[0]);
                     continue;
                 }
 
@@ -216,7 +216,7 @@ public class Controller {
                 continue;
             }
 
-            System.out.printf("No student is found for id=%s", input);
+            System.out.printf("No student is found for id=%s%n", input);
         }
 
     }
