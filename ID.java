@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class ID {
-    private static int nextID = 1000;
+    private static int nextID = 1001;
 
     private final LinkedHashMap<String, Integer> emails; // maps an email to an ID
     private final HashMap<Integer, Student>      students; // maps an ID to a student
@@ -81,7 +81,7 @@ public class ID {
             return students.get(id);
         }
 
-        System.out.printf("No student is found for id=%d", id);
+        System.out.printf("No student is found for id=%d%n", id);
         return null;
     }
 }
