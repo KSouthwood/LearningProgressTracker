@@ -1,9 +1,6 @@
 package tracker;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class CourseStatistics {
@@ -13,11 +10,15 @@ public abstract class CourseStatistics {
     String courseName;
 
     private final Map<Integer, Integer> studentTotal;
+    private final Map<Integer, Boolean> studentPassed;
+    private final ArrayList<Integer> notifyStudent;
 
     CourseStatistics() {
         this.totalPoints = 0;
         this.numOfEntries = 0d;
         this.studentTotal = new HashMap<>();
+        this.studentPassed = new HashMap<>();
+        this.notifyStudent = new ArrayList<>();
     }
 
     String getCourseName() {
@@ -27,6 +28,10 @@ public abstract class CourseStatistics {
     void addPoints(final int id, final int points) {
         if (points > 0) {
             studentTotal.put(id, studentTotal.getOrDefault(id, 0) + points);
+            studentPassed.put(id, studentPassed.getOrDefault(id, false));
+            if (studentTotal.get(id) >= pointsToCompleteCourse && !studentPassed.get(id)) {
+                notifyStudent.add(id);
+            }
             totalPoints += points;
             numOfEntries++;
         }
@@ -70,11 +75,16 @@ public abstract class CourseStatistics {
                                         .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k, v) -> k,
                                                                   LinkedHashMap::new));
-            for (var entry : sortedMap.entrySet()) {
-                System.out.printf("%-6d  %4d    %4.1f%%%n", entry.getKey(), entry.getValue(),
-                                  (entry.getValue() / pointsToCompleteCourse) * 100);
-            }
+
+            sortedMap.forEach((k, v) -> System.out.printf("%-6d  %4d    %4.1f%%%n", k, v,
+                                                          (v / pointsToCompleteCourse) * 100));
         }
+    }
+
+    List<Integer> getNotifications() {
+        var notifications = new ArrayList<>(notifyStudent);
+        notifyStudent.clear();
+        return notifications;
     }
 }
 
