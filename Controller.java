@@ -16,7 +16,6 @@ public class Controller {
     private final List<CourseStatistics> courses;
 
 
-
     {
         id = new ID();
         java = new Java(600);
@@ -278,8 +277,7 @@ public class Controller {
     }
 
     void printCourseStatistics() {
-
-        var                    result  = getPopularCourses(courses);
+        var result = getPopularCourses(courses);
         System.out.printf("Most popular: %s%nLeast popular: %s%n", result.get(0), result.get(1));
 
         if (!result.get(0).equals("n/a")) {
@@ -291,13 +289,13 @@ public class Controller {
             result = getCourseDifficulty(courses);
         }
         System.out.printf("Easiest course: %s%nHardest course: %s%n", result.get(0), result.get(1));
-
     }
 
     private List<String> getPopularCourses(final List<CourseStatistics> courses) {
         TreeMap<Integer, ArrayList<String>> popular = new TreeMap<>();
         for (var course : courses) {
-            popular.computeIfAbsent(course.getNumOfStudentsEnrolled(), k -> new ArrayList<>()).add(course.getCourseName());
+            popular.computeIfAbsent(course.getNumOfStudentsEnrolled(), k -> new ArrayList<>())
+                   .add(course.getCourseName());
         }
 
         // handle case where no students have completed any assignments
@@ -312,7 +310,8 @@ public class Controller {
     private List<String> getActiveCourses(final List<CourseStatistics> courses) {
         TreeMap<Double, ArrayList<String>> active = new TreeMap<>();
         for (var course : courses) {
-            active.computeIfAbsent(course.getNumOfEntries(), k -> new ArrayList<>()).add(course.getCourseName());
+            active.computeIfAbsent(course.getNumOfEntries(), k -> new ArrayList<>())
+                  .add(course.getCourseName());
         }
 
         return List.of(String.join(", ", active.lastEntry().getValue()),
@@ -323,7 +322,8 @@ public class Controller {
     private List<String> getCourseDifficulty(final List<CourseStatistics> courses) {
         TreeMap<Double, ArrayList<String>> difficulty = new TreeMap<>();
         for (var course : courses) {
-            difficulty.computeIfAbsent(course.getAverageScore(), k -> new ArrayList<>()).add(course.getCourseName());
+            difficulty.computeIfAbsent(course.getAverageScore(), k -> new ArrayList<>())
+                      .add(course.getCourseName());
         }
 
         return List.of(String.join(", ", difficulty.lastEntry().getValue()),

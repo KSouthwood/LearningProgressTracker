@@ -70,10 +70,12 @@ public class ID {
 
     /**
      * Get a student by id.
-     *
+     * <p>
      * Gets a student based on a supplied id.
      *
-     * @param id of the student to get
+     * @param id
+     *         of the student to get
+     *
      * @return Student or null if the id is invalid
      */
     Student getStudent(int id) {

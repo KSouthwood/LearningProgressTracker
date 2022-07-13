@@ -4,14 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class CourseStatistics {
-    private long   totalPoints;
-    private double numOfEntries;
-    double pointsToCompleteCourse;
-    String courseName;
-
     private final Map<Integer, Integer> studentTotal;
     private final Map<Integer, Boolean> studentPassed;
-    private final ArrayList<Integer> notifyStudent;
+    private final ArrayList<Integer>    notifyStudent;
+    double pointsToCompleteCourse;
+    String courseName;
+    private long   totalPoints;
+    private double numOfEntries;
 
     CourseStatistics() {
         this.totalPoints = 0;
