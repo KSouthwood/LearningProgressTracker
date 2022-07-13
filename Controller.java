@@ -13,6 +13,9 @@ public class Controller {
     private final Databases dbs;
     private final Spring    spring;
 
+    private final List<CourseStatistics> courses;
+
+
 
     {
         id = new ID();
@@ -20,6 +23,7 @@ public class Controller {
         dsa = new DSA(400);
         dbs = new Databases(480);
         spring = new Spring(550);
+        courses = List.of(java, dsa, dbs, spring);
     }
 
     Controller(Scanner scanner) {
@@ -41,6 +45,7 @@ public class Controller {
                 case "list" -> id.printStudentList();
                 case "add points" -> addPoints();
                 case "find" -> findStudent();
+                case "notify" -> notifyStudents();
                 case "statistics" -> statistics();
                 case "exit" -> getCommands = false;
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
@@ -176,10 +181,14 @@ public class Controller {
             }
 
             // would rather use the first regex which ensures the ID portion matches our
-            // ID class limit. Hyperskill testing uses strings there and wants an
-            // "id not found" message for it, so the second regex is needed.
+            // ID class limit and limits points to the range 0-100.
+            // Hyperskill testing uses strings for an ID and wants an "id not found" message for it,
+            // so the second regex is needed up through stage 4. Stage 5 needs the third regex to allow
+            // for quick testing of the student notifications.
+
 //            if (input.matches("^\\d{4}(\s+([0-9]|[1-9][0-9]|100)){4}$")) {
-            if (input.matches("^\\w*(\\s+([0-9]|[1-9][0-9]|100)){4}$")) {
+//            if (input.matches("^\\w*(\\s+([0-9]|[1-9][0-9]|100)){4}$")) {
+            if (input.matches("^\\w*(\\s+(\\d{1,3})){4}$")) {
                 var inputs = input.split("\\s+");
                 if (!inputs[0].matches("\\d*")) {
                     System.out.printf("No student is found for id=%s%n", inputs[0]);
@@ -229,10 +238,28 @@ public class Controller {
 
             System.out.printf("No student is found for id=%s%n", input);
         }
-
     }
 
-    void statistics() {
+    private void notifyStudents() {
+        Set<Integer> notifications = new HashSet<>();
+        for (var course : courses) {
+            var studentsToNotify = course.getNotifications();
+            for (var student : studentsToNotify) {
+                notifications.add(student);
+                Student studentInfo = id.getStudent(student);
+                System.out.printf("""
+                                  To: %s
+                                  Re: Your Learning Progress
+                                  Hello, %s %s! You have accomplished our %s course!
+                                  """,
+                                  studentInfo.getEmail(), studentInfo.getFirstName(),
+                                  studentInfo.getLastName(), course.getCourseName());
+            }
+        }
+        System.out.printf("Total %d students have been notified.%n", notifications.size());
+    }
+
+    private void statistics() {
         System.out.println("Type the name of a course to see details or 'back' to quit:");
         printCourseStatistics();
 
@@ -251,7 +278,7 @@ public class Controller {
     }
 
     void printCourseStatistics() {
-        List<CourseStatistics> courses = List.of(java, dsa, dbs, spring);
+
         var                    result  = getPopularCourses(courses);
         System.out.printf("Most popular: %s%nLeast popular: %s%n", result.get(0), result.get(1));
 
@@ -270,8 +297,7 @@ public class Controller {
     private List<String> getPopularCourses(final List<CourseStatistics> courses) {
         TreeMap<Integer, ArrayList<String>> popular = new TreeMap<>();
         for (var course : courses) {
-            var students = course.getNumOfStudentsEnrolled();
-            popular.computeIfAbsent(students, k -> new ArrayList<>()).add(course.getCourseName());
+            popular.computeIfAbsent(course.getNumOfStudentsEnrolled(), k -> new ArrayList<>()).add(course.getCourseName());
         }
 
         // handle case where no students have completed any assignments
@@ -279,44 +305,29 @@ public class Controller {
             return List.of("n/a", "n/a");
         }
 
-        // handles case where all courses have the same number of students enrolled (> 0)
-        if (popular.size() == 1) {
-            return List.of(String.join(", ", popular.firstEntry().getValue()), "n/a");
-        }
-
         return List.of(String.join(", ", popular.lastEntry().getValue()),
-                       String.join(", ", popular.firstEntry().getValue()));
+                       popular.size() > 1 ? String.join(", ", popular.firstEntry().getValue()) : "n/a");
     }
 
     private List<String> getActiveCourses(final List<CourseStatistics> courses) {
         TreeMap<Double, ArrayList<String>> active = new TreeMap<>();
         for (var course : courses) {
-            var activity = course.getNumOfEntries();
-            active.computeIfAbsent(activity, k -> new ArrayList<>()).add(course.getCourseName());
-        }
-
-        if (active.size() == 1) {
-            return List.of(String.join(", ", active.firstEntry().getValue()), "n/a");
+            active.computeIfAbsent(course.getNumOfEntries(), k -> new ArrayList<>()).add(course.getCourseName());
         }
 
         return List.of(String.join(", ", active.lastEntry().getValue()),
-                       String.join(", ", active.firstEntry().getValue()));
+                       active.size() > 1 ? String.join(", ", active.firstEntry().getValue()) : "n/a");
 
     }
 
     private List<String> getCourseDifficulty(final List<CourseStatistics> courses) {
         TreeMap<Double, ArrayList<String>> difficulty = new TreeMap<>();
         for (var course : courses) {
-            var average = course.getAverageScore();
-            difficulty.computeIfAbsent(average, k -> new ArrayList<>()).add(course.getCourseName());
-        }
-
-        if (difficulty.size() == 1) {
-            return List.of(String.join(", ", difficulty.firstEntry().getValue()), "n/a");
+            difficulty.computeIfAbsent(course.getAverageScore(), k -> new ArrayList<>()).add(course.getCourseName());
         }
 
         return List.of(String.join(", ", difficulty.lastEntry().getValue()),
-                       String.join(", ", difficulty.firstEntry().getValue()));
+                       difficulty.size() > 1 ? String.join(", ", difficulty.firstEntry().getValue()) : "n/a");
 
     }
 }

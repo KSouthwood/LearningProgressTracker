@@ -35,4 +35,16 @@ public class Student {
         System.out.printf("%d points: Java=%d; DSA=%d; Databases=%d; Spring=%d%n",
                           id, java, dsa, dbs, spring);
     }
+
+    String getFirstName() {
+        return firstName;
+    }
+
+    String getLastName() {
+        return lastName;
+    }
+
+    String getEmail() {
+        return email;
+    }
 }
